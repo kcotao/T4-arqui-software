@@ -1,0 +1,7 @@
+fastapi==0.115.4
+uvicorn[standard]==0.30.6
+pydantic==2.9.2
+sqlmodel==0.0.22
+asyncpg==0.29.0
+aio-pika==9.4.3
+python-dotenv==1.0.1

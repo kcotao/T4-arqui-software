@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Threads UI</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>Threads</h1>
+
+    <form id="new-thread-form">
+      <input id="channel" placeholder="channel_id" value="canal-1" required />
+      <input id="title" placeholder="título del hilo" required />
+      <input id="created_by" placeholder="creado por (usuario)" required />
+      <button type="submit">Crear hilo</button>
+    </form>
+
+    <div id="errors" class="error" hidden></div>
+
+    <div class="toolbar">
+      <button id="reload">Recargar</button>
+    </div>
+
+    <ul id="threads" class="list"></ul>
+  </div>
+
+  <template id="thread-item">
+    <li class="item">
+      <div class="item-main">
+        <strong class="t-title"></strong>
+        <div class="t-meta"></div>
+      </div>
+      <div class="item-actions">
+        <button class="btn-abrir">Abrir</button>
+        <button class="btn-archivar">Archivar</button>
+        <button class="btn-borrar">Borrar</button>
+      </div>
+    </li>
+  </template>
+
+  <!-- Modal simple -->
+  <dialog id="detail">
+    <div class="detail">
+      <h3 id="d-title"></h3>
+      <p id="d-meta"></p>
+      <pre id="d-json"></pre>
+      <button id="d-close">Cerrar</button>
+    </div>
+  </dialog>
+
+  <script src="./app.js"></script>
+</body>
+</html>
