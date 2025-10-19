@@ -40,12 +40,21 @@
     </li>
   </template>
 
-  <!-- Modal simple -->
+  <!-- Modal de detalles -->
   <dialog id="detail">
     <div class="detail">
       <h3 id="d-title"></h3>
       <p id="d-meta"></p>
+
       <pre id="d-json"></pre>
+
+      <!-- Nueva sección para comentarios -->
+      <section class="comments-section">
+        <h4>Comentarios</h4>
+        <button id="load-comments">Cargar comentarios</button>
+        <ul id="comments" class="comments-list"></ul>
+      </section>
+
       <button id="d-close">Cerrar</button>
     </div>
   </dialog>

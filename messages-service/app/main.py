@@ -15,10 +15,8 @@ VENDOR = "application/vnd.messages.v1+json"
 app = FastAPI(title="Messages Service", version="1.0.0")
 
 app.add_middleware(
-    CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"]
-    allow_origins=["http://localhost:3000","http://127.0.0.1:3000"],
-    allow_methods=["*"],
-    allow_headers["*"],
+    CORSMiddleware, allow_methods=["*"], allow_headers=["*"],
+    allow_origins=["http://localhost:3000","http://127.0.0.1:3000", "http://127.0.0.1:8000", "http://localhost:8000"],
 )
 
 class Message(SQLModel, table=True):
