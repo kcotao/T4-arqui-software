@@ -1,20 +1,55 @@
-Usar
+# 🧩 Threads Service
 
+## 🚀 Cómo iniciar el proyecto
+
+### 1️⃣ Crear y levantar los contenedores
+Ejecuta en la raíz del proyecto:
+
+```bash
 docker compose up --build
+```
 
-y en otra consola iniciar
+### 2️⃣ Iniciar el frontend
+En otra consola (desde la carpeta del proyecto):
 
+```bash
 python -m http.server 3000
+```
 
-ejecutar:
-docker compose exec db psql -U threads -d threads -c "insert into channel (id,name,is_active,updated_at) values ('canal-1','General',true,now()) on conflict (id) do update set name=excluded.name,is_active=excluded.is_active,updated_at=now();"
+### 3️⃣ Simular un canal inicial
+Ejecuta este comando **una vez levantados los contenedores** para simular la existencia de un canal llamado `canal-1`, necesario para crear y visualizar threads:
 
-luego meterse a:
-http://localhost:3000/web/?
-para ver los threads
+```bash
+docker compose exec db psql -U threads -d threads -c "insert into channel (id,name,is_active,updated_at)
+ values ('canal-1','General',true,now())
+ on conflict (id) do update
+ set name=excluded.name, is_active=excluded.is_active, updated_at=now();"
+```
 
-y en los docs:
-http://localhost:8001/docs#/
-http://localhost:8000/docs#/threads
+> 💡 Este paso crea (o actualiza) el canal “General” con ID `canal-1`, el cual servirá para iniciar los **threads**.
 
-también para crear mensajes o crear threads
+---
+
+## 🌐 Interfaz y APIs
+
+### 🖥️ UI de Threads
+Abre la siguiente URL en tu navegador:
+👉 [http://localhost:3000/web/](http://localhost:3000/web/)
+
+### 📘 API de Threads
+Disponible en:
+👉 [http://localhost:8000/docs#/threads](http://localhost:8000/docs#/threads)
+
+### 💬 API de Mensajes
+Disponible en:
+👉 [http://localhost:8001/docs#/](http://localhost:8001/docs#/)
+
+> Desde estas APIs puedes **crear mensajes o threads** usando FastAPI, y luego **visualizarlos en la interfaz web.**
+
+---
+
+## 🧠 Resumen
+1. `docker compose up --build` → levanta los servicios.  
+2. `python -m http.server 3000` → inicia la UI.  
+3. Ejecuta el `INSERT` para crear el canal inicial.  
+4. Abre [http://localhost:3000/web/](http://localhost:3000/web/) y explora los threads y mensajes.
