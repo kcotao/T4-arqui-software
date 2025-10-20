@@ -44,7 +44,7 @@ Disponible en:
 Disponible en:
 👉 [http://localhost:8001/docs#/](http://localhost:8001/docs#/)
 
-> Desde estas APIs puedes **crear mensajes o threads** usando FastAPI, y luego **visualizarlos en la interfaz web.**
+> Desde estas APIs puedes **crear mensajes o threads** usando FastAPI, y luego **visualizarlos en la interfaz web.** Se debe usar la id dee algun canal ya creado a la hora de crear un mensaje.
 
 ---
 
