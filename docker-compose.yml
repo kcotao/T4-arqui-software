@@ -31,14 +31,6 @@ services:
       rabbitmq:
         condition: service_healthy
     ports: ["8000:8000"]
-  messages:
-    build: ./messages-service
-    env_file: ./messages-service/.env
-    depends_on:
-      db:
-        condition: service_healthy
-    ports:  
-      - "8001:8000"
 
 volumes:
   pgdata:

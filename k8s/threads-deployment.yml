@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: threads-deployment
+spec:
+  replicas: 2 # Empezamos con 2
+  selector:
+    matchLabels:
+      app: threads
+  template:
+    metadata:
+      labels:
+        app: threads
+    spec:
+      containers:
+        - name: threads
+          image: flaviooyarce/t4-arqui-software:v1 # 👈 ¡Reemplaza esto!
+          ports:
+            - containerPort: 8000
+          env:
+            # 🔽 Apunta al servicio 'db' que creamos en k8s/db-service.yml
+            - name: DATABASE_URL
+              value: "postgresql+asyncpg://threads:threads@db:5432/threads"
+
+            # 🔽 Apunta al servicio 'rabbitmq' que creamos en k8s/rabbitmq-service.yml
+            - name: RABBITMQ_URL
+              value: "amqp://guest:guest@rabbitmq:5672/"
+
+            # --- El resto de tus variables ---
+            - name: SERVICE_NAME
+              value: "threads"
+            - name: EVENT_EXCHANGE
+              value: "platform.events"
+            - name: EVENT_VERSION
+              value: "1"
+            - name: CHANNEL_EVENT_QUEUE
+              value: "threads.channel.events"
+            - name: ENABLE_EVENTS
+              value: "true"
+
+            # 🔽 ¡ESTA ES la única variable que usa "*"!
+            - name: ALLOWED_ORIGINS
+              value: "*"

@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  # "hostname" interno para que tu app se conecte
+  name: db
+spec:
+  type: ClusterIP
+  ports:
+    - port: 5432
+  selector:
+    app: db
