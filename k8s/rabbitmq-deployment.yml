@@ -14,7 +14,6 @@ spec:
     spec:
       containers:
         - name: rabbitmq
-          # De tu docker-compose.yml
           image: rabbitmq:3-management
           ports:
             - name: amqp

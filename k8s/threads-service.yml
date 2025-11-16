@@ -3,9 +3,9 @@ kind: Service
 metadata:
   name: threads-service
 spec:
-  type: LoadBalancer # 👈 Esto crea la URL pública
+  type: LoadBalancer
   ports:
-    - port: 80 # Puerto público
-      targetPort: 8000 # Puerto de tu app
+    - port: 80
+      targetPort: 8000
   selector:
     app: threads
