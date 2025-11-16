@@ -1,0 +1,72 @@
+# --- 1. Tu Servicio (Esto ya funcionó) ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-gateway-service-threads
+spec:
+  type: ClusterIP
+  selector:
+    app: api-gateway-app-threads
+  ports:
+    - port: 5000
+
+---
+# --- 2. Tu Deployment (El Contenedor) ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-gateway-deployment-threads
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api-gateway-app-threads
+  template:
+    metadata:
+      labels:
+        app: api-gateway-app-threads
+    spec:
+      containers:
+        - name: api-gateway-container
+          image: ghcr.io/rmasad/microservicios:main
+          ports:
+            - containerPort: 5000
+
+          # 🔽 --- ¡AÑADE ESTE BLOQUE! --- 🔽
+          # Esto le dice al Gateway (GraphQL) dónde está tu servicio
+          env:
+            # (Seguimos asumiendo que el nombre es THREADS_SERVICE_URL)
+            - name: THREADS_SERVICE_URL
+              # Apunta al nombre de tu servicio de threads (el de la Tarea 1)
+              value: "http://threads-service:80"
+          # 🔼 --- FIN DEL BLOQUE AÑADIDO --- 🔼
+---
+# --- 3. Tu Ingress (¡AQUÍ ESTÁ EL ARREGLO!) ---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: microservices-ingress-threads # (Asumo que lo llamaste así)
+  annotations:
+    # 🔽 ¡ARREGLO #2! (La anotación 'ingress.class' se fue de aquí)
+    cert-manager.io/issuer: letsencrypt-issuer
+    nginx.ingress.kubernetes.io/proxy-body-size: 50m
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  # 🔽 ¡ARREGLO #2! (Se añadió 'ingressClassName' aquí)
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - demo.inf326.nursoft.dev
+      secretName: letsencrypt
+  rules:
+    - host: demo.inf326.nursoft.dev
+      http:
+        paths:
+          - path: /threads(/|$)(.*) # Tu ruta personalizada
+            # 🔽 ¡ARREGLO #1! (Cambiamos 'Prefix' por esto)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: api-gateway-service-threads
+                port:
+                  number: 5000

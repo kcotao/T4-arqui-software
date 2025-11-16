@@ -14,12 +14,12 @@ jobs:
 
     steps:
       # 1. Trae tu código del repositorio
-      - name: Check out code
+      - name: T4-arqui-software
         uses: actions/checkout@v3
 
       # 2. Inicia sesión en Docker Hub
       # (Usa los secretos que configuraremos en el Paso 2)
-      - name: Log in to Docker Hub
+      - name: flaviooyarce
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
