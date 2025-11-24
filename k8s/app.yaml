@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: threads-backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: threads-api
+  template:
+    metadata:
+      labels:
+        app: threads-api
+    spec:
+      containers:
+      - name: threads-api
+        image: tiraoelmas/threads-backend:v40
+        ports:
+        - containerPort: 8000
+        envFrom:
+        - configMapRef:
+            name: threads-config 
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: threads-api-service
+spec:
+  type: ClusterIP 
+  selector:
+    app: threads-api
+  ports:
+    - protocol: TCP
+      port: 80      # Puerto externo (al que llamarás)
+      targetPort: 8000 # Puerto interno (donde corre uvicorn)

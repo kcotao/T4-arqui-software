@@ -56,8 +56,10 @@ class ThreadInDB(BaseModel):
 
 # ---- Base model for simple responses ----
 class ThreadBase(BaseModel):
+    thread_id: str
+    uuid: str
     title: str
-    user_id: str
+    created_by: str
     channel_id: str
 
 

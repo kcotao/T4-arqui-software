@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  api:
+    build: .  
+    container_name: threads_backend
+    ports:
+      - "8000:8000" # Expone el puerto
+    depends_on:
+      - mongodb
+      - rabbitmq
+    volumes:
+      - .:/app 
+    environment:
+      - DATABASE_URL=mongodb://mongodb:27017
+      - RABBITMQ_URL=amqp://guest:guest@message-broker:5672/
+      - ENABLE_EVENTS=true
+      - EVENT_EXCHANGE=plataform.events
+
+  # Base de datos: MongoDB
+  mongodb:
+    image: mongo:latest
+    container_name: mi_mongo
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+  # Mensajería: RabbitMQ (Versión con panel de gestión)
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: mi_rabbitmq
+    restart: always
+    ports:
+      - "5672:5672"   
+      - "15672:15672" 
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+
+volumes:
+  mongo_data:

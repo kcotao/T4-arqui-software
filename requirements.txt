@@ -4,3 +4,9 @@ motor
 pydantic
 httpx
 python-multipart
+sqlmodel==0.0.22
+asyncpg==0.29.0
+aio-pika==9.4.3
+python-dotenv==1.0.1
+beanie
+httpx
