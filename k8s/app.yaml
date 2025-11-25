@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: threads-api
-        image: tiraoelmas/threads-backend:v40
+        image: tiraoelmas/threads-backend:v48
         ports:
         - containerPort: 8000
         envFrom:

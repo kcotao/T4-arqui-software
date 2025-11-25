@@ -12,7 +12,7 @@ def get_thread_repo(db: AsyncIOMotorDatabase = Depends(get_database)):
     return ThreadRepository(db)
 
 @router.get("/{thread_id}", summary="Buscar hilo por ID")
-async def get_thread(thread_id: str, repo: ThreadRepository = Depends(get_thread_repo)):
+async def get_thread(thread_id: str, repo: ThreadRepository = Depends(get_thread_repo)):    
     doc = await repo.get_thread(thread_id)
     if not doc:
         raise HTTPException(status_code=404, detail="Thread not found")
@@ -20,6 +20,8 @@ async def get_thread(thread_id: str, repo: ThreadRepository = Depends(get_thread
 
 @router.post("/", summary="Crear hilo")
 async def create_thread(channel_id: str, thread_name: str, user_id: str, repo: ThreadRepository = Depends(get_thread_repo)):
+    if not channel_id or not thread_name or not user_id:
+        raise HTTPException(status_code=422, detail="Missing fields")
     return await repo.create_thread(channel_id, thread_name, user_id)
 
 

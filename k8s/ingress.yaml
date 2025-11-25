@@ -6,6 +6,8 @@ metadata:
     kubernetes.io/ingress.class: nginx
     cert-manager.io/issuer: letsencrypt-issuer
     nginx.ingress.kubernetes.io/proxy-body-size: 50m
+    # 💡 ESTA ANNOTATION ES CLAVE: Necesaria para el backend
+    nginx.ingress.kubernetes.io/rewrite-target: /$2 
 spec:
   tls:
   - hosts:
@@ -15,10 +17,21 @@ spec:
     - host: threads.inf326.nursoft.dev
       http: 
         paths:
-          - path: /
+          # 1. REGLA PARA EL BACKEND (API)
+          - path: /threads(/|$)(.*) # <--- La API se moverá a /threads
             pathType: Prefix
             backend:
               service:
                 name:  threads-api-service
                 port:
                   number: 80
+          
+          # 2. REGLA PARA EL FRONTEND (RAÍZ)
+          - path: / # <--- La raíz ahora es para el frontend
+            pathType: Prefix
+            backend:
+              service:
+                name: threads-frontend-service # <--- ¡Nuevo Service!
+                port:
+                  number: 80
+            

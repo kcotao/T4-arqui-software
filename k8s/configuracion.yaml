@@ -7,8 +7,6 @@ data:
   DATABASE_URL: "mongodb://mongo-service:27017"
   RABBITMQ_URL: "amqp://guest:guest@message-broker:5672/"
   
-  
-  
   EVENT_EXCHANGE: "channel_service_exchange"
   CHANNEL_EVENT_QUEUE: "threads_service_queue"
   ENABLE_EVENTS: "true"
