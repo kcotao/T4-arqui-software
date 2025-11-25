@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  # Servicio para servir la aplicación Frontend
+  frontend:
+    build: 
+      context: ./frontend-threads  # Busca el Dockerfile en la carpeta 'frontend'
+    container_name: threads_frontend
+    ports:
+      - "80:80"           # Mapea el puerto 80 del host al puerto 80 del contenedor Nginx
+    # Monta la carpeta local para que cualquier cambio en HTML/CSS/JS se refleje sin reconstruir
+    volumes:
+      - ./frontend-threads:/usr/share/nginx/html:ro
+    restart: unless-stopped

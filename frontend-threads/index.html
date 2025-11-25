@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Threads API Frontend</title>
+    
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header {
+            background-color: #4a90e2;
+            color: white;
+            padding: 20px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        main {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            padding: 20px;
+            width: 90%;
+            max-width: 1200px;
+        }
+
+        .api-form {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        h2 {
+            color: #4a90e2;
+            border-bottom: 2px solid #ccc;
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+
+        form input[type="text"],
+        form textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        form button {
+            background-color: #5cb85c;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        form button:hover {
+            background-color: #4cae4c;
+        }
+
+        #results {
+            width: 90%;
+            max-width: 1200px;
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #333;
+            color: #00ff00;
+            border-radius: 8px;
+            margin-bottom: 40px;
+        }
+
+        #results h2 {
+            color: #00ff00;
+            border-bottom: 1px dashed #666;
+        }
+
+        #output {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-family: 'Consolas', 'Courier New', monospace;
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Threads Service 🧵</h1>
+        <p>Interactuando con la API en <code>https://threads.inf326.nursoft.dev</code></p>
+    </header>
+
+    <main>
+        <section class="api-form">
+            <h2>➕ Crear Hilo (POST /threads/threads/)</h2>
+            <form id="createThreadForm">
+                <input type="text" id="post-channel-id" placeholder="Channel ID (string)" required>
+                <input type="text" id="post-thread-name" placeholder="Nombre del Hilo (string)" required>
+                <input type="text" id="post-user-id" placeholder="User ID (string)" required>
+                <button type="submit">Crear Hilo</button>
+            </form>
+        </section>
+
+        <section class="api-form">
+            <h2>🔎 Buscar Hilo por ID (GET /threads/threads/{thread_id})</h2>
+            <form id="getThreadByIdForm">
+                <input type="text" id="get-thread-id" placeholder="Thread ID (string)" required>
+                <button type="submit">Buscar Hilo</button>
+            </form>
+        </section>
+
+        <section class="api-form">
+            <h2>✍️ Editar Hilo (PUT /threads/threads/{thread_id}/edit)</h2>
+            <form id="editThreadForm">
+                <input type="text" id="put-thread-id" placeholder="Thread ID a editar (string)" required>
+                <input type="text" id="put-title" placeholder="Nuevo Título (string)" required>
+                <textarea id="put-metadata" placeholder='Metadata (JSON, Ej: {"status": "open"})'></textarea>
+                <button type="submit">Editar Hilo</button>
+            </form>
+        </section>
+
+        <section class="api-form">
+            <h2>🗑️ Eliminar Hilo (DELETE /threads/threads/{thread_id})</h2>
+            <form id="deleteThreadForm">
+                <input type="text" id="delete-thread-id" placeholder="Thread ID a eliminar (string)" required>
+                <button type="submit">Eliminar Hilo</button>
+            </form>
+        </section>
+        
+        <section class="api-form">
+            <h2>📋 Mis Hilos (GET /threads/threads/mine/{user_id})</h2>
+            <form id="getThreadsByUserIdForm">
+                <input type="text" id="get-user-id" placeholder="User ID (string)" required>
+                <button type="submit">Buscar Mis Hilos</button>
+            </form>
+        </section>
+    </main>
+
+    <section id="results">
+        <h2>Resultados de la API</h2>
+        <pre id="output"></pre>
+    </section>
+
+    <script>
+        const API_BASE_URL = "https://threads.inf326.nursoft.dev";
+        const outputElement = document.getElementById('output');
+
+        // Función genérica para mostrar resultados
+        const displayResult = (data, status) => {
+            outputElement.textContent = `Status: ${status}\n\n`;
+            outputElement.textContent += typeof data === 'string' ? data : JSON.stringify(data, null, 2);
+        };
+
+        // Función para manejar errores de la red/fetch
+        const handleError = (error) => {
+            console.error("Error en la petición:", error);
+            displayResult({ error: "Error de red o CORS", details: error.message }, "ERROR");
+        };
+
+        // ----------------------------------------------------
+        // 1. POST: Crear Hilo
+        // ----------------------------------------------------
+        document.getElementById('createThreadForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const channelId = document.getElementById('post-channel-id').value;
+            const threadName = document.getElementById('post-thread-name').value;
+            const userId = document.getElementById('post-user-id').value;
+
+            // Ruta: /threads/threads/?...
+            const url = `${API_BASE_URL}/threads/threads/?channel_id=${channelId}&thread_name=${threadName}&user_id=${userId}`;
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                });
+
+                const data = await response.json().catch(() => response.text());
+
+                displayResult(data, response.status);
+            } catch (error) {
+                handleError(error);
+            }
+        });
+
+        // ----------------------------------------------------
+        // 2. GET: Buscar Hilo por ID
+        // ----------------------------------------------------
+        document.getElementById('getThreadByIdForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const threadId = document.getElementById('get-thread-id').value;
+            // Ruta: /threads/threads/{threadId}
+            const url = `${API_BASE_URL}/threads/threads/${threadId}`;
+
+            try {
+                const response = await fetch(url);
+                const data = await response.json().catch(() => response.text()); 
+
+                displayResult(data, response.status);
+            } catch (error) {
+                handleError(error);
+            }
+        });
+
+        // ----------------------------------------------------
+        // 3. PUT: Editar Hilo
+        // ----------------------------------------------------
+        document.getElementById('editThreadForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const threadId = document.getElementById('put-thread-id').value;
+            const title = document.getElementById('put-title').value;
+            const metadataText = document.getElementById('put-metadata').value;
+
+            let metadata = {};
+            try {
+                metadata = metadataText ? JSON.parse(metadataText) : {};
+            } catch (err) {
+                alert("Metadata no es un JSON válido.");
+                return;
+            }
+            
+            // Ruta: /threads/threads/{threadId}/edit
+            const url = `${API_BASE_URL}/threads/threads/${threadId}/edit`;
+            
+            try {
+                const response = await fetch(url, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ title: title, metadata: metadata }),
+                });
+
+                const data = await response.json().catch(() => response.text());
+
+                displayResult(data, response.status);
+            } catch (error) {
+                handleError(error);
+            }
+        });
+
+        // ----------------------------------------------------
+        // 4. DELETE: Eliminar Hilo
+        // ----------------------------------------------------
+        document.getElementById('deleteThreadForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const threadId = document.getElementById('delete-thread-id').value;
+            // Ruta: /threads/threads/{threadId}
+            const url = `${API_BASE_URL}/threads/threads/${threadId}`;
+
+            try {
+                const response = await fetch(url, {
+                    method: 'DELETE',
+                });
+                
+                if (response.status === 204) {
+                    displayResult("Hilo eliminado con éxito (No Content)", response.status);
+                } else {
+                    const data = await response.json().catch(() => response.text()); 
+                    displayResult(data, response.status);
+                }
+
+            } catch (error) {
+                handleError(error);
+            }
+        });
+
+        // ----------------------------------------------------
+        // 5. GET: Revisar hilos creados según ID de usuario
+        // ----------------------------------------------------
+        document.getElementById('getThreadsByUserIdForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const userId = document.getElementById('get-user-id').value;
+            // Ruta: /threads/threads/mine/{userId}
+            const url = `${API_BASE_URL}/threads/threads/mine/${userId}`;
+
+            try {
+                const response = await fetch(url);
+                const data = await response.json().catch(() => response.text()); 
+
+                displayResult(data, response.status);
+            } catch (error) {
+                handleError(error);
+            }
+        });
+    </script>
+</body>
+</html>
