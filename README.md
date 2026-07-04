@@ -1,7 +1,3 @@
-Aquí tienes el texto en **formato README.md**, bien estructurado y listo para pegar en tu repositorio:
-
----
-
 # 🧩 Threads Service
 
 Servicio de Threads con soporte para **ejecución local mediante Docker** y también disponible en un **despliegue en Kubernetes** utilizando imágenes Docker.
